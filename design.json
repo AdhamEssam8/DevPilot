@@ -1,0 +1,520 @@
+{
+  "designSystem": {
+    "name": "DevPilot Design System",
+    "version": "1.0.0",
+    "description": "A clean, modern, minimal design system with a professional and approachable aesthetic",
+    
+    "designPrinciples": {
+      "clarity": "Every component should communicate its purpose clearly and immediately",
+      "consistency": "Similar elements should look and behave similarly across the application",
+      "hierarchy": "Visual hierarchy guides users through information and actions",
+      "accessibility": "Design should be usable by everyone, with proper contrast and interactive states",
+      "minimalism": "Remove unnecessary elements; focus on essential functionality",
+      "professionalism": "Maintain a polished, trustworthy appearance suitable for business use"
+    },
+    
+    "colorPalette": {
+      "primary": {
+        "main": "#3B82F6",
+        "description": "Blue - Used for primary actions, selected states, active elements, and highlights",
+        "usage": ["Primary buttons", "Active tabs", "Selected calendar dates", "Progress bars", "Links", "Icons in active state"]
+      },
+      "secondary": {
+        "main": "#6B7280",
+        "description": "Gray - Used for secondary actions, disabled states, and supporting text",
+        "usage": ["Secondary buttons", "Disabled elements", "Placeholder text", "Borders", "Icons"]
+      },
+      "background": {
+        "light": "#F9FAFB",
+        "default": "#FFFFFF",
+        "description": "Light gray background for page/section backgrounds, white for cards and inputs"
+      },
+      "status": {
+        "pending": "#FCD34D",
+        "description": "Yellow/Amber - Used for pending states and warnings",
+        "usage": ["Status badges", "Warning indicators"]
+      },
+      "text": {
+        "primary": "#111827",
+        "secondary": "#6B7280",
+        "disabled": "#9CA3AF",
+        "description": "Dark gray for primary text, medium gray for secondary, light gray for disabled"
+      },
+      "border": {
+        "default": "#E5E7EB",
+        "focus": "#3B82F6",
+        "description": "Light gray for default borders, blue for focused/active states"
+      }
+    },
+    
+    "typography": {
+      "fontFamily": {
+        "primary": "system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif",
+        "description": "System font stack for optimal performance and native feel"
+      },
+      "fontSizes": {
+        "xs": "0.75rem",
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.125rem",
+        "xl": "1.25rem",
+        "2xl": "1.5rem",
+        "3xl": "1.875rem"
+      },
+      "fontWeights": {
+        "normal": "400",
+        "medium": "500",
+        "semibold": "600",
+        "bold": "700"
+      },
+      "lineHeights": {
+        "tight": "1.25",
+        "normal": "1.5",
+        "relaxed": "1.75"
+      }
+    },
+    
+    "spacing": {
+      "scale": [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96],
+      "unit": "px",
+      "description": "4px base unit for consistent spacing throughout",
+      "usage": {
+        "xs": "4px - Tight spacing for related elements",
+        "sm": "8px - Small spacing for grouped items",
+        "md": "16px - Default spacing between elements",
+        "lg": "24px - Section spacing",
+        "xl": "32px - Large section spacing",
+        "2xl": "48px - Major section separation"
+      }
+    },
+    
+    "borderRadius": {
+      "none": "0",
+      "sm": "4px",
+      "md": "6px",
+      "lg": "8px",
+      "xl": "12px",
+      "full": "9999px",
+      "description": "Subtle rounding for modern feel without being overly rounded"
+    },
+    
+    "shadows": {
+      "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+      "md": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+      "description": "Subtle shadows for depth, used sparingly for elevation"
+    },
+    
+    "components": {
+      "button": {
+        "styles": {
+          "primary": {
+            "background": "primary.main",
+            "text": "#FFFFFF",
+            "border": "none",
+            "padding": "8px 16px",
+            "borderRadius": "md",
+            "fontWeight": "medium",
+            "states": {
+              "hover": "Slightly darker blue",
+              "active": "Darker blue",
+              "disabled": "secondary.main with reduced opacity"
+            }
+          },
+          "secondary": {
+            "background": "transparent",
+            "text": "text.primary",
+            "border": "1px solid border.default",
+            "padding": "8px 16px",
+            "borderRadius": "md",
+            "fontWeight": "medium",
+            "states": {
+              "hover": "Light gray background",
+              "active": "Medium gray background"
+            }
+          },
+          "ghost": {
+            "background": "transparent",
+            "text": "text.secondary",
+            "border": "none",
+            "padding": "8px 16px",
+            "fontWeight": "normal"
+          }
+        },
+        "sizes": {
+          "sm": "padding: 6px 12px, fontSize: sm",
+          "md": "padding: 8px 16px, fontSize: base",
+          "lg": "padding: 12px 24px, fontSize: lg"
+        },
+        "withIcon": {
+          "iconPosition": "right",
+          "iconSpacing": "8px",
+          "description": "Icons typically appear to the right of text with consistent spacing"
+        }
+      },
+      
+      "input": {
+        "base": {
+          "background": "background.default",
+          "border": "1px solid border.default",
+          "borderRadius": "md",
+          "padding": "8px 12px",
+          "fontSize": "base",
+          "color": "text.primary"
+        },
+        "states": {
+          "default": "border: border.default",
+          "focus": "border: border.focus, outline: 2px solid primary.main with opacity",
+          "disabled": "background: background.light, color: text.disabled, cursor: not-allowed",
+          "error": "border: red-500"
+        },
+        "placeholder": {
+          "color": "text.secondary",
+          "fontStyle": "normal"
+        }
+      },
+      
+      "select": {
+        "base": "Same as input",
+        "indicator": {
+          "type": "dropdown arrow (⌄) or diamond (◇)",
+          "position": "right",
+          "color": "text.secondary"
+        },
+        "options": {
+          "background": "background.default",
+          "padding": "8px 12px",
+          "hover": "background.light"
+        }
+      },
+      
+      "tags": {
+        "base": {
+          "background": "primary.main",
+          "color": "#FFFFFF",
+          "padding": "4px 8px",
+          "borderRadius": "full",
+          "fontSize": "sm",
+          "display": "inline-flex",
+          "alignItems": "center",
+          "gap": "4px"
+        },
+        "removable": {
+          "closeIcon": "x icon, color: white, size: 12px",
+          "hover": "Slightly darker background"
+        },
+        "multiSelect": {
+          "container": "flex wrap with gap-2",
+          "tagSpacing": "4px"
+        }
+      },
+      
+      "tabs": {
+        "base": {
+          "container": "flex row with gap-0",
+          "borderBottom": "1px solid border.default"
+        },
+        "tab": {
+          "padding": "12px 16px",
+          "fontWeight": "medium",
+          "color": "text.secondary",
+          "borderBottom": "2px solid transparent",
+          "display": "flex",
+          "alignItems": "center",
+          "gap": "8px"
+        },
+        "active": {
+          "color": "primary.main",
+          "borderBottom": "2px solid primary.main"
+        },
+        "withIcon": {
+          "iconSize": "16px",
+          "iconSpacing": "8px"
+        }
+      },
+      
+      "toggle": {
+        "base": {
+          "width": "44px",
+          "height": "24px",
+          "borderRadius": "full",
+          "background": "secondary.main",
+          "position": "relative",
+          "transition": "background 0.2s"
+        },
+        "active": {
+          "background": "primary.main"
+        },
+        "thumb": {
+          "width": "20px",
+          "height": "20px",
+          "background": "#FFFFFF",
+          "borderRadius": "full",
+          "position": "absolute",
+          "left": "2px",
+          "transition": "transform 0.2s",
+          "boxShadow": "sm"
+        },
+        "activeThumb": {
+          "transform": "translateX(20px)"
+        }
+      },
+      
+      "progressBar": {
+        "base": {
+          "width": "100%",
+          "height": "8px",
+          "background": "background.light",
+          "borderRadius": "full",
+          "overflow": "hidden"
+        },
+        "fill": {
+          "background": "primary.main",
+          "height": "100%",
+          "borderRadius": "full",
+          "transition": "width 0.3s ease"
+        },
+        "label": {
+          "fontSize": "sm",
+          "color": "text.secondary",
+          "marginBottom": "4px"
+        }
+      },
+      
+      "calendar": {
+        "base": {
+          "background": "background.default",
+          "borderRadius": "lg",
+          "padding": "16px",
+          "boxShadow": "md"
+        },
+        "header": {
+          "display": "flex",
+          "justifyContent": "space-between",
+          "alignItems": "center",
+          "marginBottom": "16px"
+        },
+        "monthYear": {
+          "fontSize": "lg",
+          "fontWeight": "semibold",
+          "color": "text.primary"
+        },
+        "navigation": {
+          "icon": "arrow (< >)",
+          "color": "text.secondary",
+          "hover": "primary.main"
+        },
+        "grid": {
+          "display": "grid",
+          "gridTemplateColumns": "repeat(7, 1fr)",
+          "gap": "4px"
+        },
+        "day": {
+          "padding": "8px",
+          "textAlign": "center",
+          "borderRadius": "md",
+          "color": "text.primary",
+          "cursor": "pointer"
+        },
+        "selected": {
+          "background": "primary.main",
+          "color": "#FFFFFF"
+        },
+        "today": {
+          "border": "1px solid primary.main"
+        }
+      },
+      
+      "statusBadge": {
+        "base": {
+          "display": "inline-flex",
+          "alignItems": "center",
+          "padding": "4px 8px",
+          "borderRadius": "md",
+          "fontSize": "sm",
+          "fontWeight": "medium"
+        },
+        "pending": {
+          "background": "status.pending",
+          "color": "text.primary"
+        },
+        "withClose": {
+          "closeIcon": "x, size: 12px, marginLeft: 4px, cursor: pointer"
+        }
+      },
+      
+      "card": {
+        "base": {
+          "background": "background.default",
+          "borderRadius": "lg",
+          "padding": "16px",
+          "boxShadow": "sm",
+          "border": "1px solid border.default"
+        },
+        "header": {
+          "marginBottom": "12px",
+          "fontSize": "lg",
+          "fontWeight": "semibold"
+        }
+      },
+      
+      "icons": {
+        "style": "outline",
+        "strokeWidth": "1.5",
+        "size": {
+          "sm": "16px",
+          "md": "20px",
+          "lg": "24px"
+        },
+        "color": {
+          "default": "text.secondary",
+          "active": "primary.main",
+          "hover": "primary.main"
+        },
+        "spacing": {
+          "withText": "8px gap"
+        }
+      },
+      
+      "datePicker": {
+        "base": "Same as input",
+        "icon": {
+          "type": "calendar icon",
+          "position": "right",
+          "color": "text.secondary"
+        },
+        "timeInput": {
+          "separate": "true",
+          "format": "12:00 am/pm",
+          "spacing": "8px from date input"
+        }
+      },
+      
+      "textEditor": {
+        "base": {
+          "border": "1px solid border.default",
+          "borderRadius": "md",
+          "minHeight": "120px"
+        },
+        "toolbar": {
+          "background": "background.light",
+          "borderBottom": "1px solid border.default",
+          "padding": "8px",
+          "display": "flex",
+          "gap": "8px"
+        },
+        "toolbarButton": {
+          "padding": "6px 8px",
+          "borderRadius": "sm",
+          "hover": "background.light"
+        },
+        "content": {
+          "padding": "12px",
+          "minHeight": "100px"
+        }
+      },
+      
+      "radio": {
+        "base": {
+          "size": "16px",
+          "border": "2px solid border.default",
+          "borderRadius": "full"
+        },
+        "selected": {
+          "border": "2px solid primary.main",
+          "innerCircle": "8px solid primary.main"
+        },
+        "group": {
+          "spacing": "12px vertical",
+          "labelSpacing": "8px"
+        }
+      },
+      
+      "filter": {
+        "base": {
+          "background": "background.light",
+          "border": "1px solid border.default",
+          "borderRadius": "md",
+          "padding": "12px"
+        },
+        "header": {
+          "fontWeight": "medium",
+          "marginBottom": "4px"
+        },
+        "subtitle": {
+          "fontSize": "sm",
+          "color": "text.secondary"
+        },
+        "actions": {
+          "position": "right",
+          "iconSpacing": "8px"
+        }
+      }
+    },
+    
+    "layout": {
+      "container": {
+        "maxWidth": "1280px",
+        "padding": "24px",
+        "margin": "0 auto"
+      },
+      "grid": {
+        "columns": 12,
+        "gap": "24px"
+      },
+      "section": {
+        "spacing": "32px vertical",
+        "padding": "24px"
+      }
+    },
+    
+    "interactions": {
+      "transitions": {
+        "duration": "200ms",
+        "easing": "ease-in-out",
+        "properties": ["background-color", "border-color", "color", "transform", "opacity"]
+      },
+      "hover": {
+        "opacity": "0.9 for buttons",
+        "background": "Lighter shade for interactive elements",
+        "cursor": "pointer"
+      },
+      "focus": {
+        "outline": "2px solid primary.main",
+        "outlineOffset": "2px"
+      },
+      "active": {
+        "transform": "scale(0.98) for buttons",
+        "opacity": "0.8"
+      }
+    },
+    
+    "patterns": {
+      "form": {
+        "label": {
+          "fontSize": "sm",
+          "fontWeight": "medium",
+          "color": "text.primary",
+          "marginBottom": "4px",
+          "display": "block"
+        },
+        "fieldSpacing": "16px vertical",
+        "groupSpacing": "24px vertical"
+      },
+      "list": {
+        "itemSpacing": "8px",
+        "itemPadding": "12px",
+        "hover": "background.light"
+      },
+      "modal": {
+        "overlay": "rgba(0, 0, 0, 0.5)",
+        "background": "background.default",
+        "borderRadius": "lg",
+        "padding": "24px",
+        "maxWidth": "500px",
+        "boxShadow": "lg"
+      }
+    }
+  }
+}
+
