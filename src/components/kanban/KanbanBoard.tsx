@@ -4,24 +4,39 @@ import { useState, useEffect } from 'react'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Card, CardContent } from '@/components/ui/Card'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 import { Task, TaskStatus } from '@/types'
-import { Plus, Clock, User } from 'lucide-react'
+import { Clock, User, Calendar } from 'lucide-react'
+import { format } from 'date-fns'
 
 interface KanbanBoardProps {
   projectId: string
+  onTasksChange?: () => void
 }
 
-const columns: { id: TaskStatus; title: string; color: string }[] = [
-  { id: 'backlog', title: 'Backlog', color: 'bg-gray-100' },
-  { id: 'todo', title: 'To Do', color: 'bg-blue-100' },
-  { id: 'in_progress', title: 'In Progress', color: 'bg-yellow-100' },
-  { id: 'review', title: 'Review', color: 'bg-purple-100' },
-  { id: 'done', title: 'Done', color: 'bg-green-100' },
+// Map to 3 columns: To Do, In Progress, Done
+const columns: { id: TaskStatus; title: string }[] = [
+  { id: 'todo', title: 'To Do' },
+  { id: 'in_progress', title: 'In Progress' },
+  { id: 'done', title: 'Done' },
 ]
 
-export function KanbanBoard({ projectId }: KanbanBoardProps) {
+// Map other statuses to our 3 columns
+const mapStatusToColumn = (status: TaskStatus): TaskStatus => {
+  if (status === 'todo' || status === 'backlog') return 'todo'
+  if (status === 'in_progress' || status === 'review') return 'in_progress'
+  if (status === 'done') return 'done'
+  return 'todo'
+}
+
+const getStatusVariant = (status: TaskStatus): 'pending' | 'success' | 'error' | 'info' => {
+  if (status === 'done') return 'success'
+  if (status === 'in_progress') return 'info'
+  return 'pending'
+}
+
+export function KanbanBoard({ projectId, onTasksChange }: KanbanBoardProps) {
   const { user } = useAuth()
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
@@ -62,7 +77,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       return
     }
 
-    const newStatus = destination.droppableId as TaskStatus
+    const newStatus = mapStatusToColumn(destination.droppableId as TaskStatus)
     const taskId = draggableId
 
     // Optimistic update
@@ -88,6 +103,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
         .eq('id', taskId)
 
       if (error) throw error
+      onTasksChange?.()
     } catch (error) {
       console.error('Error updating task:', error)
       // Revert optimistic update
@@ -95,41 +111,19 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     }
   }
 
-  const createTask = async (status: TaskStatus) => {
-    const title = prompt('Enter task title:')
-    if (!title) return
-
-    try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .insert({
-          project_id: projectId,
-          user_id: user?.id,
-          title,
-          status,
-          order_index: tasks.filter(task => task.status === status).length,
-        })
-        .select()
-        .single()
-
-      if (error) throw error
-      setTasks(prev => [...prev, data])
-    } catch (error) {
-      console.error('Error creating task:', error)
-    }
-  }
-
   const getTasksByStatus = (status: TaskStatus) => {
-    return tasks.filter(task => task.status === status)
+    return tasks.filter(task => {
+      const mappedStatus = mapStatusToColumn(task.status)
+      return mappedStatus === status
+    })
   }
 
   if (loading) {
     return (
       <div className="animate-pulse">
-        <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-64 bg-gray-200 rounded"></div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-64 bg-gray-200 rounded-lg"></div>
           ))}
         </div>
       </div>
@@ -137,86 +131,113 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Project Tasks</h2>
-        <Button onClick={() => createTask('backlog')}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Task
-        </Button>
-      </div>
-
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {columns.map((column) => (
-            <div key={column.id} className="space-y-4">
-              <div className={`p-3 rounded-lg ${column.color}`}>
-                <h3 className="font-medium text-gray-900">{column.title}</h3>
-                <p className="text-sm text-gray-600">
-                  {getTasksByStatus(column.id).length} tasks
-                </p>
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {columns.map((column) => {
+          const columnTasks = getTasksByStatus(column.id)
+          
+          return (
+            <div key={column.id} className="space-y-3">
+              {/* Column Header */}
+              <div className="flex items-center justify-between px-2">
+                <h3 className="font-semibold text-gray-900">{column.title}</h3>
+                <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                  {columnTasks.length}
+                </span>
               </div>
 
+              {/* Droppable Column */}
               <Droppable droppableId={column.id}>
                 {(provided, snapshot) => (
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    className={`min-h-[200px] p-2 rounded-lg border-2 border-dashed transition-colors ${
+                    className={`min-h-[400px] p-3 rounded-lg border-2 border-dashed transition-colors ${
                       snapshot.isDraggingOver
-                        ? 'border-blue-400 bg-blue-50'
-                        : 'border-gray-200'
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 bg-gray-50'
                     }`}
                   >
-                    {getTasksByStatus(column.id).map((task, index) => (
-                      <Draggable
-                        key={task.id}
-                        draggableId={task.id}
-                        index={index}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={`p-3 bg-white rounded-lg shadow-sm border mb-2 transition-shadow ${
-                              snapshot.isDragging
-                                ? 'shadow-lg'
-                                : 'hover:shadow-md'
-                            }`}
-                          >
-                            <h4 className="font-medium text-gray-900 mb-1">
-                              {task.title}
-                            </h4>
-                            {task.description && (
-                              <p className="text-sm text-gray-600 mb-2">
-                                {task.description}
-                              </p>
-                            )}
-                            <div className="flex items-center justify-between text-xs text-gray-500">
-                              {task.estimate_hours && (
-                                <div className="flex items-center">
-                                  <Clock className="h-3 w-3 mr-1" />
-                                  {task.estimate_hours}h
+                    {columnTasks.length === 0 ? (
+                      <div className="text-center py-8 text-sm text-gray-400">
+                        No tasks
+                      </div>
+                    ) : (
+                      columnTasks.map((task, index) => (
+                        <Draggable
+                          key={task.id}
+                          draggableId={task.id}
+                          index={index}
+                        >
+                          {(provided, snapshot) => (
+                            <Card
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className={`mb-3 cursor-move transition-shadow ${
+                                snapshot.isDragging
+                                  ? 'shadow-lg ring-2 ring-blue-500'
+                                  : 'hover:shadow-md'
+                              }`}
+                            >
+                              <CardContent className="p-4">
+                                {/* Task Title */}
+                                <h4 className="font-medium text-gray-900 mb-2">
+                                  {task.title}
+                                </h4>
+
+                                {/* Task Description */}
+                                {task.description && (
+                                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                                    {task.description}
+                                  </p>
+                                )}
+
+                                {/* Status Badge */}
+                                <div className="mb-3">
+                                  <StatusBadge variant={getStatusVariant(task.status)}>
+                                    {task.status.replace('_', ' ')}
+                                  </StatusBadge>
                                 </div>
-                              )}
-                              <div className="flex items-center">
-                                <User className="h-3 w-3 mr-1" />
-                                {user?.email?.split('@')[0]}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
+
+                                {/* Task Meta Info */}
+                                <div className="space-y-2 text-xs text-gray-500">
+                                  {/* Assignee */}
+                                  <div className="flex items-center gap-2">
+                                    <User className="h-3 w-3" />
+                                    <span>{user?.email?.split('@')[0] || 'Unassigned'}</span>
+                                  </div>
+
+                                  {/* Due Date (using created_at as placeholder) */}
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="h-3 w-3" />
+                                    <span>
+                                      Created {format(new Date(task.created_at), 'MMM d, yyyy')}
+                                    </span>
+                                  </div>
+
+                                  {/* Estimate Hours */}
+                                  {task.estimate_hours && (
+                                    <div className="flex items-center gap-2">
+                                      <Clock className="h-3 w-3" />
+                                      <span>{task.estimate_hours}h estimated</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )}
+                        </Draggable>
+                      ))
+                    )}
                     {provided.placeholder}
                   </div>
                 )}
               </Droppable>
             </div>
-          ))}
-        </div>
-      </DragDropContext>
-    </div>
+          )
+        })}
+      </div>
+    </DragDropContext>
   )
 }

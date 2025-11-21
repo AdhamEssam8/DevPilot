@@ -5,13 +5,13 @@ import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { Layout } from '@/components/layout/Layout'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Project, ProjectPlan } from '@/types'
-import { KanbanBoard } from '@/components/kanban/KanbanBoard'
-import { ProjectPlanner } from '@/components/ai/ProjectPlanner'
-import { ArrowLeft, ExternalLink, Archive, Edit } from 'lucide-react'
+import { ProgressBar } from '@/components/ui/ProgressBar'
+import { Project, Task } from '@/types'
+import { ArrowLeft, Edit, Plus, Sparkles } from 'lucide-react'
 import Link from 'next/link'
+import { KanbanBoard } from '@/components/kanban/KanbanBoard'
 
 export default function ProjectDetailPage() {
   const { user } = useAuth()
@@ -20,12 +20,14 @@ export default function ProjectDetailPage() {
   const projectId = params.id as string
 
   const [project, setProject] = useState<Project | null>(null)
+  const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
-  const [showPlanner, setShowPlanner] = useState(false)
+  const [showAISuggestions, setShowAISuggestions] = useState(false)
 
   useEffect(() => {
     if (user && projectId) {
       fetchProject()
+      fetchTasks()
     }
   }, [user, projectId])
 
@@ -50,60 +52,35 @@ export default function ProjectDetailPage() {
     }
   }
 
-  const archiveProject = async () => {
-    if (!confirm('Are you sure you want to archive this project?')) return
-
+  const fetchTasks = async () => {
     try {
-      const { error } = await supabase
-        .from('projects')
-        .update({ status: 'archived' })
-        .eq('id', projectId)
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('project_id', projectId)
+        .eq('user_id', user?.id)
+        .order('order_index')
 
       if (error) throw error
-      router.push('/projects')
+      setTasks(data || [])
     } catch (error) {
-      console.error('Error archiving project:', error)
+      console.error('Error fetching tasks:', error)
     }
   }
 
-  const handleGenerateBoard = async (plan: ProjectPlan) => {
-    if (!project) return
-
-    try {
-      // Create tasks from the AI plan
-      const tasks = plan.phases.flatMap((phase, phaseIndex) =>
-        phase.tasks.map((task, taskIndex) => ({
-          project_id: project.id,
-          user_id: user?.id,
-          title: task.title,
-          description: task.description,
-          status: 'backlog' as const,
-          order_index: phaseIndex * 100 + taskIndex,
-          estimate_hours: task.estimate_hours,
-        }))
-      )
-
-      const { error } = await supabase
-        .from('tasks')
-        .insert(tasks)
-
-      if (error) throw error
-
-      setShowPlanner(false)
-      // Refresh the page to show new tasks
-      window.location.reload()
-    } catch (error) {
-      console.error('Error creating tasks:', error)
-      alert('Error creating tasks. Please try again.')
-    }
+  const calculateProgress = () => {
+    if (tasks.length === 0) return 0
+    const doneTasks = tasks.filter(task => task.status === 'done').length
+    return Math.round((doneTasks / tasks.length) * 100)
   }
 
   if (loading) {
     return (
       <Layout>
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-96 bg-gray-200 rounded"></div>
         </div>
       </Layout>
     )
@@ -122,136 +99,131 @@ export default function ProjectDetailPage() {
     )
   }
 
+  const progress = calculateProgress()
+
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-4">
             <Button variant="outline" size="sm" asChild>
               <Link href="/projects">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Projects
+                Back
               </Link>
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
-              <p className="text-gray-600">
-                {project.client?.name || 'No client assigned'} • {project.status}
+              <p className="text-sm text-gray-600 mt-1">
+                {project.client?.name || 'No client assigned'}
               </p>
             </div>
           </div>
-
-          <div className="flex space-x-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/projects/${project.id}/edit`}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Link>
-            </Button>
-            <Button variant="outline" size="sm" onClick={archiveProject}>
-              <Archive className="h-4 w-4 mr-2" />
-              Archive
-            </Button>
-          </div>
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/projects/${project.id}/edit`}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Project
+            </Link>
+          </Button>
         </div>
 
-        {/* Project Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Project Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {project.description && (
-                  <div>
-                    <h3 className="font-medium text-gray-900 mb-2">Description</h3>
-                    <p className="text-gray-600">{project.description}</p>
-                  </div>
-                )}
+        {/* Progress Bar */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700">Project Progress</span>
+                <span className="text-sm font-semibold text-gray-900">{progress}%</span>
+              </div>
+              <ProgressBar value={progress} />
+              <p className="text-xs text-gray-500 mt-1">
+                {tasks.filter(t => t.status === 'done').length} of {tasks.length} tasks completed
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
-                {project.tech_stack && project.tech_stack.length > 0 && (
-                  <div>
-                    <h3 className="font-medium text-gray-900 mb-2">Tech Stack</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {project.tech_stack.map((tech) => (
-                        <span
-                          key={tech}
-                          className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
+        {/* AI Suggestions Section (Optional) */}
+        {showAISuggestions && (
+          <Card className="border-blue-200 bg-blue-50">
+            <CardContent className="pt-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="h-5 w-5 text-blue-600" />
+                    <h3 className="font-semibold text-gray-900">AI Suggestions</h3>
                   </div>
-                )}
-
-                {project.repo_url && (
-                  <div>
-                    <h3 className="font-medium text-gray-900 mb-2">Repository</h3>
-                    <a
-                      href={project.repo_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center text-blue-600 hover:text-blue-800"
-                    >
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      View Repository
-                    </a>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+                  <p className="text-sm text-gray-600 mb-4">
+                    Based on your project progress, here are some recommendations:
+                  </p>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 mt-0.5">•</span>
+                      <span>Consider breaking down large tasks into smaller, more manageable pieces</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 mt-0.5">•</span>
+                      <span>Review tasks in "In Progress" that have been there for more than a week</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 mt-0.5">•</span>
+                      <span>Prioritize tasks based on client deadlines and dependencies</span>
+                    </li>
+                  </ul>
+                </div>
                 <Button
-                  onClick={() => setShowPlanner(!showPlanner)}
-                  className="w-full"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAISuggestions(false)}
+                  className="ml-4"
                 >
-                  AI Project Planner
+                  Dismiss
                 </Button>
-                <Button variant="outline" className="w-full" asChild>
-                  <Link href={`/invoices/new?project=${project.id}`}>
-                    Create Invoice
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {project.client && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Client Information</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <h3 className="font-medium">{project.client.name}</h3>
-                    {project.client.email && (
-                      <p className="text-sm text-gray-600">{project.client.email}</p>
-                    )}
-                    {project.client.phone && (
-                      <p className="text-sm text-gray-600">{project.client.phone}</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </div>
-
-        {/* AI Project Planner */}
-        {showPlanner && (
-          <ProjectPlanner onGenerateBoard={handleGenerateBoard} />
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Kanban Board */}
-        <KanbanBoard projectId={project.id} />
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-gray-900">Tasks</h2>
+            <div className="flex items-center gap-2">
+              {!showAISuggestions && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAISuggestions(true)}
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  AI Suggestions
+                </Button>
+              )}
+              <Button
+                onClick={() => {
+                  const title = prompt('Enter task title:')
+                  if (!title) return
+                  
+                  supabase
+                    .from('tasks')
+                    .insert({
+                      project_id: projectId,
+                      user_id: user?.id,
+                      title,
+                      status: 'todo',
+                      order_index: tasks.filter(t => t.status === 'todo').length,
+                    })
+                    .then(() => fetchTasks())
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Task
+              </Button>
+            </div>
+          </div>
+          <KanbanBoard projectId={projectId} onTasksChange={fetchTasks} />
+        </div>
       </div>
     </Layout>
   )
