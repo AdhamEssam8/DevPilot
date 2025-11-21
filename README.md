@@ -72,6 +72,19 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ### 3. Database Setup
 
+**IMPORTANT**: You must set up the database schema in Supabase before using the app.
+
+1. Go to your [Supabase Dashboard](https://supabase.com/dashboard)
+2. Open the **SQL Editor**
+3. Copy and paste the entire contents of `supabase-schema.sql`
+4. Click **Run** to execute the schema
+
+This will create all necessary tables, indexes, and RLS policies.
+
+**If you see "Could not find the table 'public.projects'" error**, it means the schema hasn't been run yet. See `DATABASE_SETUP.md` for detailed instructions.
+
+### 4. Database Setup (Detailed)
+
 1. Create a new Supabase project
 2. Run the SQL schema in your Supabase SQL editor:
 
