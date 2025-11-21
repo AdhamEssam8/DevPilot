@@ -12,6 +12,7 @@ import { Project, ProjectNote } from '@/types'
 import { ArrowLeft, Plus, Search, StickyNote, Tag, X, Edit2, Trash2, Save } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import { ProjectTabs } from '@/components/projects/ProjectTabs'
 
 export default function NotesScreen() {
   const { user } = useAuth()
@@ -232,6 +233,12 @@ export default function NotesScreen() {
               <p className="text-sm text-gray-600 mt-1">Notes</p>
             </div>
           </div>
+        </div>
+
+        {/* Navigation Tabs */}
+        <ProjectTabs />
+
+        <div className="flex justify-end mb-4">
           <Button
             size="sm"
             onClick={() => setShowNewNote(true)}

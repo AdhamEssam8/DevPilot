@@ -10,11 +10,12 @@ import { Button } from '@/components/ui/Button'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { Project, Task } from '@/types'
-import { ArrowLeft, Edit, Plus, Sparkles, FileText, MessageSquare, StickyNote, Link as LinkIcon } from 'lucide-react'
+import { ArrowLeft, Plus, Sparkles, FileText, MessageSquare, StickyNote } from 'lucide-react'
 import Link from 'next/link'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
 import { format } from 'date-fns'
 import { ProjectPlanner } from '@/components/ai/ProjectPlanner'
+import { ProjectTabs } from '@/components/projects/ProjectTabs'
 
 export default function KanbanScreen() {
   const { user } = useAuth()
@@ -179,7 +180,7 @@ export default function KanbanScreen() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/projects/${projectId}`}>
+              <Link href="/projects">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Link>
@@ -230,6 +231,9 @@ export default function KanbanScreen() {
             </Button>
           </div>
         </div>
+
+        {/* Navigation Tabs */}
+        <ProjectTabs />
 
         {/* Progress Bar */}
         <Card>

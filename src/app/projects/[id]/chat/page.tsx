@@ -12,6 +12,7 @@ import { Project, ProjectChatMessage } from '@/types'
 import { ArrowLeft, Send, Paperclip, User, MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import { ProjectTabs } from '@/components/projects/ProjectTabs'
 
 export default function ChatRoomScreen() {
   const { user } = useAuth()
@@ -225,6 +226,9 @@ export default function ChatRoomScreen() {
             <p className="text-sm text-gray-600 mt-1">Team Chat</p>
           </div>
         </div>
+
+        {/* Navigation Tabs */}
+        <ProjectTabs />
 
         {/* Chat Container */}
         <Card className="flex flex-col" style={{ height: 'calc(100vh - 300px)', minHeight: '500px' }}>

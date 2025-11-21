@@ -12,6 +12,7 @@ import { Project, ProjectResource } from '@/types'
 import { ArrowLeft, Upload, Search, File, Image, FileText, Trash2, Download, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import { ProjectTabs } from '@/components/projects/ProjectTabs'
 
 export default function ResourcesScreen() {
   const { user } = useAuth()
@@ -196,6 +197,12 @@ export default function ResourcesScreen() {
               <p className="text-sm text-gray-600 mt-1">Resources & Files</p>
             </div>
           </div>
+        </div>
+
+        {/* Navigation Tabs */}
+        <ProjectTabs />
+
+        <div className="flex justify-end">
           <label className="cursor-pointer">
             <span className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-9 px-3">
               <Upload className="h-4 w-4 mr-2" />
