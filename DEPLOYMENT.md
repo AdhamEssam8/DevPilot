@@ -36,7 +36,7 @@ STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
 STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
 
 # App
-NEXT_PUBLIC_APP_URL=https://your-domain.vercel.app
+NEXT_PUBLIC_APP_URL=https://dev-pilot-topaz.vercel.app
 ```
 
 ### 4. Deploy
@@ -65,8 +65,10 @@ NEXT_PUBLIC_APP_URL=https://your-domain.vercel.app
 
 1. Go to Authentication > Settings
 2. Enable email authentication
-3. Add your production domain to "Site URL"
-4. Add your domain to "Redirect URLs"
+3. Set "Site URL" to: `https://dev-pilot-topaz.vercel.app`
+4. Add to "Redirect URLs":
+   - `https://dev-pilot-topaz.vercel.app/auth/callback`
+   - `https://dev-pilot-topaz.vercel.app/**`
 
 ### 4. Create Storage Bucket
 
@@ -87,7 +89,7 @@ NEXT_PUBLIC_APP_URL=https://your-domain.vercel.app
 
 1. Go to Developers > Webhooks
 2. Click "Add endpoint"
-3. Set URL to: `https://your-domain.vercel.app/api/stripe/webhook`
+3. Set URL to: `https://dev-pilot-topaz.vercel.app/api/stripe/webhook`
 4. Select events:
    - `checkout.session.completed`
    - `payment_intent.payment_failed`

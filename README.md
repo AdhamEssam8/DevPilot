@@ -173,7 +173,7 @@ Make sure to set these in your Vercel dashboard:
 - `STRIPE_SECRET_KEY`
 - `STRIPE_PUBLISHABLE_KEY`
 - `STRIPE_WEBHOOK_SECRET`
-- `NEXT_PUBLIC_APP_URL` (your production URL)
+- `NEXT_PUBLIC_APP_URL` (set to `https://dev-pilot-topaz.vercel.app`)
 
 ## 📖 Usage
 
