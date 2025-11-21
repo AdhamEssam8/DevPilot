@@ -2,32 +2,44 @@
 
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/Button'
-import { LogOut, User } from 'lucide-react'
+import Link from 'next/link'
+import { Plus, Bell } from 'lucide-react'
 
 export function Header() {
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
+  const userInitials = user?.email?.charAt(0).toUpperCase() || 'U'
 
   return (
-    <header className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <h1 className="text-xl font-bold text-gray-900">DevPilot</h1>
-          </div>
+    <header className="bg-white border-b border-gray-300 sticky top-0 z-10">
+      <div className="flex items-center justify-between h-16 px-6">
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-md bg-blue-500 flex items-center justify-center">
+              <span className="text-white font-bold text-sm">DP</span>
+            </div>
+            <span className="text-xl font-semibold text-gray-900 hidden sm:block">DevPilot</span>
+          </Link>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <Button
+            asChild
+            className="bg-blue-500 text-white hover:bg-blue-600"
+          >
+            <Link href="/projects/new">
+              <Plus className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">New Project</span>
+              <span className="sm:hidden">New</span>
+            </Link>
+          </Button>
           
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-700 flex items-center">
-              <User className="h-4 w-4 mr-2" />
-              {user?.email}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => signOut()}
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
+          <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
+          </button>
+          
+          <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-medium cursor-pointer hover:bg-blue-600 transition-colors">
+            {userInitials}
           </div>
         </div>
       </div>
