@@ -20,7 +20,12 @@ export default function SettingsPage() {
     company_name: '',
     company_logo: '',
     default_hourly_rate: 100,
-    invoice_footer: ''
+    invoice_footer: '',
+    bank_name: '',
+    account_number: '',
+    account_holder: '',
+    account_type: '',
+    iban: ''
   })
 
   useEffect(() => {
@@ -47,7 +52,12 @@ export default function SettingsPage() {
           company_name: data.company_name || '',
           company_logo: data.company_logo || '',
           default_hourly_rate: data.default_hourly_rate || 100,
-          invoice_footer: data.invoice_footer || ''
+          invoice_footer: data.invoice_footer || '',
+          bank_name: data.bank_name || '',
+          account_number: data.account_number || '',
+          account_holder: data.account_holder || '',
+          account_type: data.account_type || '',
+          iban: data.iban || ''
         })
       }
     } catch (error) {
@@ -72,6 +82,11 @@ export default function SettingsPage() {
             company_logo: formData.company_logo,
             default_hourly_rate: formData.default_hourly_rate,
             invoice_footer: formData.invoice_footer,
+            bank_name: formData.bank_name || null,
+            account_number: formData.account_number || null,
+            account_holder: formData.account_holder || null,
+            account_type: formData.account_type || null,
+            iban: formData.iban || null,
             updated_at: new Date().toISOString()
           })
           .eq('id', settings.id)
@@ -86,7 +101,12 @@ export default function SettingsPage() {
             company_name: formData.company_name,
             company_logo: formData.company_logo,
             default_hourly_rate: formData.default_hourly_rate,
-            invoice_footer: formData.invoice_footer
+            invoice_footer: formData.invoice_footer,
+            bank_name: formData.bank_name || null,
+            account_number: formData.account_number || null,
+            account_holder: formData.account_holder || null,
+            account_type: formData.account_type || null,
+            iban: formData.iban || null
           })
           .select()
           .single()
@@ -216,6 +236,73 @@ export default function SettingsPage() {
                 <p className="text-xs text-gray-500 mt-1">
                   This text will appear at the bottom of your invoices
                 </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Banking Details */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <FileText className="h-5 w-5 mr-2" />
+                Banking Details
+              </CardTitle>
+              <CardDescription>
+                Add your banking information to appear on invoices
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Bank Name
+                  </label>
+                  <Input
+                    value={formData.bank_name}
+                    onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
+                    placeholder="Banque du Caire"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Account Number
+                  </label>
+                  <Input
+                    value={formData.account_number}
+                    onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
+                    placeholder="03203710000540"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Account Holder
+                  </label>
+                  <Input
+                    value={formData.account_holder}
+                    onChange={(e) => setFormData({ ...formData, account_holder: e.target.value })}
+                    placeholder="Your Name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Account Type
+                  </label>
+                  <Input
+                    value={formData.account_type}
+                    onChange={(e) => setFormData({ ...formData, account_type: e.target.value })}
+                    placeholder="Regular Saving Account"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    IBAN
+                  </label>
+                  <Input
+                    value={formData.iban}
+                    onChange={(e) => setFormData({ ...formData, iban: e.target.value })}
+                    placeholder="EG910004303000003203710000540"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>

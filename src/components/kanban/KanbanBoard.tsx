@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
@@ -41,13 +41,7 @@ export function KanbanBoard({ projectId, onTasksChange }: KanbanBoardProps) {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (user && projectId) {
-      fetchTasks()
-    }
-  }, [user, projectId])
-
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('tasks')
@@ -63,7 +57,24 @@ export function KanbanBoard({ projectId, onTasksChange }: KanbanBoardProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [projectId, user?.id])
+
+  useEffect(() => {
+    if (user && projectId) {
+      fetchTasks()
+    }
+  }, [user, projectId, fetchTasks])
+
+  // Expose refresh function to parent
+  useEffect(() => {
+    if (onTasksChange) {
+      const refreshKey = `kanban_refresh_${projectId}`
+      ;(window as any)[refreshKey] = fetchTasks
+      return () => {
+        delete (window as any)[refreshKey]
+      }
+    }
+  }, [projectId, onTasksChange, fetchTasks])
 
   const handleDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result

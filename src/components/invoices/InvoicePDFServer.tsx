@@ -1,8 +1,5 @@
-'use client'
-
 import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer'
 import { Invoice, InvoiceItem, CompanySettings } from '@/types'
-import { format } from 'date-fns'
 
 // Register fonts
 Font.register({
@@ -123,13 +120,13 @@ const styles = StyleSheet.create({
   },
 })
 
-interface InvoicePDFProps {
+interface InvoicePDFServerProps {
   invoice: Invoice
   items: InvoiceItem[]
   companySettings?: CompanySettings | null
 }
 
-export function InvoicePDF({ invoice, items, companySettings }: InvoicePDFProps) {
+export function InvoicePDFServer({ invoice, items, companySettings }: InvoicePDFServerProps) {
   // Combine all items into a single description
   const description = items.map(item => item.description).join(' — ')
 
@@ -235,3 +232,4 @@ export function InvoicePDF({ invoice, items, companySettings }: InvoicePDFProps)
     </Document>
   )
 }
+

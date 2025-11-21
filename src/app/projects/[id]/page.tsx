@@ -201,20 +201,32 @@ export default function ProjectDetailPage() {
                 </Button>
               )}
               <Button
-                onClick={() => {
+                onClick={async () => {
                   const title = prompt('Enter task title:')
                   if (!title) return
                   
-                  supabase
-                    .from('tasks')
-                    .insert({
-                      project_id: projectId,
-                      user_id: user?.id,
-                      title,
-                      status: 'todo',
-                      order_index: tasks.filter(t => t.status === 'todo').length,
-                    })
-                    .then(() => fetchTasks())
+                  try {
+                    const { error } = await supabase
+                      .from('tasks')
+                      .insert({
+                        project_id: projectId,
+                        user_id: user?.id,
+                        title,
+                        status: 'todo',
+                        order_index: tasks.filter(t => t.status === 'todo').length,
+                      })
+                    
+                    if (error) throw error
+                    
+                    // Refresh both local tasks and Kanban board
+                    fetchTasks()
+                    // Trigger Kanban board refresh
+                    const refreshFn = (window as any)[`kanban_refresh_${projectId}`]
+                    if (refreshFn) refreshFn()
+                  } catch (error) {
+                    console.error('Error creating task:', error)
+                    alert('Failed to create task')
+                  }
                 }}
               >
                 <Plus className="h-4 w-4 mr-2" />

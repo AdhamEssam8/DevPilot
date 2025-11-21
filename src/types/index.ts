@@ -90,6 +90,11 @@ export interface CompanySettings {
   company_logo?: string
   default_hourly_rate: number
   invoice_footer?: string
+  bank_name?: string
+  account_number?: string
+  account_holder?: string
+  account_type?: string
+  iban?: string
   created_at: string
   updated_at: string
 }
@@ -108,6 +113,45 @@ export interface ProjectPlan {
       priority: 'high' | 'medium' | 'low'
     }[]
   }[]
+}
+
+export interface ProjectResource {
+  id: string
+  project_id: string
+  user_id: string
+  name: string
+  file_type: string
+  file_size?: number
+  file_url?: string
+  storage_path?: string
+  task_id?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ProjectNote {
+  id: string
+  project_id: string
+  user_id: string
+  title: string
+  content?: string
+  tags?: string[]
+  task_id?: string
+  resource_id?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ProjectChatMessage {
+  id: string
+  project_id: string
+  user_id: string
+  message: string
+  resource_id?: string
+  created_at: string
+  user?: {
+    email: string
+  }
 }
 
 export type TaskStatus = 'backlog' | 'todo' | 'in_progress' | 'review' | 'done'
