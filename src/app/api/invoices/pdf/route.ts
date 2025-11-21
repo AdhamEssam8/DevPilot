@@ -50,13 +50,8 @@ export async function POST(request: NextRequest) {
     // For server-side PDF generation, you would use pdfkit or puppeteer
     const pdfData = generateInvoicePDF(invoice, items || [])
 
-    // Convert Buffer to ArrayBuffer
-    const arrayBuffer = pdfData.buffer.slice(
-      pdfData.byteOffset,
-      pdfData.byteOffset + pdfData.byteLength
-    )
-
-    return new NextResponse(arrayBuffer, {
+    const uint8 = new Uint8Array(pdfData)
+    return new NextResponse(uint8, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${invoice.invoice_number}.pdf"`,
