@@ -21,7 +21,7 @@ export default function AuthCallback() {
         if (data.session) {
           router.push('/')
         } else {
-          router.push('/auth/login')
+          router.push('/auth/login?error=session_expired')
         }
       } catch (error) {
         console.error('Unexpected error:', error)
