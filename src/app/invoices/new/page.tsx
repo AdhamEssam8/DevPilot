@@ -51,12 +51,11 @@ export default function NewInvoicePage() {
         .eq('user_id', user?.id)
         .order('name')
 
-      // Fetch projects
+      // Fetch projects (include all statuses, user can invoice any project)
       const { data: projectsData } = await supabase
         .from('projects')
         .select('*')
         .eq('user_id', user?.id)
-        .eq('status', 'active')
         .order('name')
 
       setClients(clientsData || [])
@@ -160,9 +159,10 @@ export default function NewInvoicePage() {
       if (itemsError) throw itemsError
 
       router.push(`/invoices/${invoice.id}`)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating invoice:', error)
-      alert('Failed to create invoice')
+      const errorMessage = error?.message || 'Failed to create invoice. Please check all fields and try again.'
+      alert(errorMessage)
     } finally {
       setSaving(false)
     }

@@ -59,9 +59,10 @@ export default function NewClientPage() {
       if (error) throw error
 
       router.push('/clients')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating client:', error)
-      alert('Error creating client. Please try again.')
+      const errorMessage = error?.message || 'Error creating client. Please try again.'
+      alert(errorMessage)
     } finally {
       setLoading(false)
     }

@@ -61,10 +61,11 @@ export default function NewProjectPage() {
         .insert({
           user_id: user?.id,
           name: formData.name,
-          description: formData.description,
+          description: formData.description || null,
           client_id: formData.client_id || null,
-          tech_stack: techStackArray,
+          tech_stack: techStackArray.length > 0 ? techStackArray : null,
           repo_url: formData.repo_url || null,
+          status: 'active',
         })
         .select()
         .single()
@@ -72,9 +73,10 @@ export default function NewProjectPage() {
       if (error) throw error
 
       router.push(`/projects/${data.id}`)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating project:', error)
-      alert('Error creating project. Please try again.')
+      const errorMessage = error?.message || 'Error creating project. Please try again.'
+      alert(errorMessage)
     } finally {
       setLoading(false)
     }
